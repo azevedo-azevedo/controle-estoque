@@ -3,272 +3,208 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App de Controle de Medicamentos</title>
+  <title>DosIA Cuida+</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="theme.css">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f6f8;
-      color: #333;
-    }
-
-    /* Cabeçalho */
-    .header {
-      background: #4C5B2F;
-      color: white;
-      text-align: center;
-      padding: 10px 5px;
-      position: relative;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .header p {
-      margin: 5px 0 0;
-      font-size: 14px;
-      font-weight: normal;
-    }
-
-    /* Botão hambúrguer */
-    .menu-btn {
-      font-size: 22px;
-      cursor: pointer;
-      background: #4C5B2F;
-      color: white;
-      padding: 10px 12px;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      border: none;
-      border-radius: 5px;
-    }
-
-    /* Menu lateral */
-    .menu {
-      width: 220px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      height: 100%;
-      background: #4C5B2F;
-      color: white;
-      padding-top: 60px;
-      transition: left 0.3s;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-
-    .menu a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      text-decoration: none;
-      padding: 15px;
-      border-bottom: 1px solid #4C5B2F;
-      font-size: 14px;
-    }
-
-    .menu a:hover {
-      background: #3a4723;
-    }
-
-    .menu img {
-      width: 18px;
-      height: 18px;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    /* Conteúdo principal */
-    .content {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .content h2 {
-      font-size: 24px;
-      color: #4C5B2F;
-      margin-bottom: 10px;
-    }
-
-    .content p {
-      font-size: 15px;
-      color: #555;
-      margin-bottom: 30px;
-    }
-
-    /* Cards */
-    .cards {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 40px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      width: 260px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .card img {
-      width: 36px;
-      height: 36px;
-    }
-
-    .card h3 {
-      margin: 15px 0 10px;
-      font-size: 18px;
-      color: #333;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #666;
-    }
-
-    /* Como usar */
-    .como-usar {
-      background: #E9F1D7;
-      border-radius: 8px;
-      padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: left;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .como-usar h4 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: #4C5B2F;
-    }
-
-    .como-usar ol {
-      padding-left: 20px;
-      margin: 0;
-    }
-
-    /* Iframe */
     iframe {
       width: 100%;
-      height: 600px;
+      height: 640px;
       border: none;
-      background: white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      border-radius: 8px;
-      margin-top: 20px;
+      background: transparent;
+      margin-top: 1.25rem;
+      overflow: hidden;
+    }
+    #calculadoraArea {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
   </style>
 </head>
 <body>
 
-<!-- Cabeçalho -->
-<div class="header" onclick="voltarInicio()" style="cursor: pointer;">
-  <button class="menu-btn" onclick="event.stopPropagation(); toggleMenu()">☰</button>
-  <h1> 💊 App de Controle de Medicamentos</h1>
-  <p>Escolha uma calculadora no menu lateral</p>
-</div>
+  <!-- Overlay do menu -->
+  <div class="mc-sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
 
   <!-- Menu lateral -->
-  <div class="menu" id="menu">
-    <button class="close-btn" onclick="toggleMenu()">✖</button>
-    <a href="#" onclick="voltarInicio()">🏠 Início</a>
-    <a href="#" onclick="carregarCalculadora('Calculadora-dose.html')">💧 Calculadora de Dose</a>
-    <a href="#" onclick="carregarCalculadora('Calculadora-estoque.html')">📦 Calculadora de Estoque</a>
-    <a href="#" onclick="carregarCalculadora('Calculadora-frasco.html')">🧴 Calculadora de Frasco</a>
+  <div class="mc-sidebar" id="menu">
+    <div class="mc-sidebar-top">
+      <span><i class="ti ti-vaccine-bottle" aria-hidden="true"></i>DosIA Cuida+</span>
+      <button class="mc-sidebar-close" onclick="toggleMenu()" aria-label="Fechar menu">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <nav>
+      <a href="#" data-page="home" class="active" onclick="voltarInicio(); return false;">
+        <i class="ti ti-home" aria-hidden="true"></i><span>Início</span>
+      </a>
+      <a href="#" data-page="dose" onclick="carregarCalculadora('Calculadora-dose.html', 'Calculadora de dose', this); return false;">
+        <i class="ti ti-droplet" aria-hidden="true"></i><span>Calculadora de dose</span>
+      </a>
+      <a href="#" data-page="estoque" onclick="carregarCalculadora('Calculadora-estoque.html', 'Calculadora de estoque', this); return false;">
+        <i class="ti ti-package" aria-hidden="true"></i><span>Calculadora de estoque</span>
+      </a>
+      <a href="#" data-page="frasco" onclick="carregarCalculadora('Calculadora-frasco.html', 'Calculadora de frasco', this); return false;">
+        <i class="ti ti-flask" aria-hidden="true"></i><span>Calculadora de frasco</span>
+      </a>
+    </nav>
+    <div class="mc-sidebar-footer">
+      <p>v1.0 · DosIA Cuida+</p>
+    </div>
+  </div>
+
+  <!-- Cabeçalho -->
+  <div class="mc-header-wrap">
+    <div class="mc-header" onclick="voltarInicio()">
+      <div class="mc-header-left">
+        <button class="mc-header-menu-btn" onclick="event.stopPropagation(); toggleMenu()" aria-label="Abrir menu">
+          <i class="ti ti-menu-2" style="font-size:20px;" aria-hidden="true"></i>
+        </button>
+        <div class="mc-header-divider"></div>
+        <div class="mc-header-brand">
+          <i class="ti ti-vaccine-bottle" style="font-size:20px;" aria-hidden="true"></i>
+          <span>DosIA Cuida+</span>
+        </div>
+      </div>
+      <div class="mc-header-right">
+        <span class="mc-header-section" id="headerSection"></span>
+        <button class="theme-switch" id="themeToggleBtn" onclick="event.stopPropagation(); toggleTheme()" aria-label="Alternar tema claro/escuro">
+          <span class="theme-switch-thumb">
+            <i class="ti ti-moon" id="themeToggleIcon" aria-hidden="true"></i>
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Tela inicial -->
-  <div class="content" id="inicio">
-    <h2>Bem-vindo ao MedControl</h2>
-    <p>Seu assistente digital para cálculos farmacêuticos precisos e seguros. Selecione uma das calculadoras disponíveis no menu lateral.</p>
+  <div class="mc-home-wrap" id="inicio">
+    <div class="mc-home-intro">
+      <h2>Bem-vindo ao DosIA Cuida+</h2>
+      <p>Seu assistente digital para cálculos farmacêuticos precisos e seguros. Selecione uma calculadora abaixo.</p>
+    </div>
 
-    <!-- Cards -->
-<div class="cards">
-  <div class="card" onclick="carregarCalculadora('Calculadora-dose.html')">
-    <h3> 💧 Calculadora de Dose</h3>
-    <p>Calcule a dose diária total baseada na dosagem prescrita.</p>
-  </div>
+    <div class="mc-home-cards">
+      <div class="mc-home-card" onclick="carregarCalculadoraHome('Calculadora-dose.html', 'Calculadora de dose', 'dose')">
+        <i class="ti ti-droplet" style="color:#185FA5;" aria-hidden="true"></i>
+        <p class="title">Calculadora de dose</p>
+        <p class="desc">Calcule a dose diária total baseada na prescrição.</p>
+        <span class="link" style="color:#185FA5;">Acessar <i class="ti ti-arrow-right" style="font-size:14px;" aria-hidden="true"></i></span>
+      </div>
 
-  <div class="card" onclick="carregarCalculadora('Calculadora-estoque.html')">
-    <h3>📦 Calculadora de Estoque</h3>
-    <p>Determine o tempo de duração do estoque do medicamento com base na administração diária.</p>
-  </div>
+      <div class="mc-home-card" onclick="carregarCalculadoraHome('Calculadora-estoque.html', 'Calculadora de estoque', 'estoque')">
+        <i class="ti ti-package" style="color:#993C1D;" aria-hidden="true"></i>
+        <p class="title">Calculadora de estoque</p>
+        <p class="desc">Veja quanto tempo o estoque atual vai durar.</p>
+        <span class="link" style="color:#993C1D;">Acessar <i class="ti ti-arrow-right" style="font-size:14px;" aria-hidden="true"></i></span>
+      </div>
 
-  <div class="card" onclick="carregarCalculadora('Calculadora-frasco.html')">
-    <h3>🧴 Calculadora de Frasco</h3>
-    <p>Calcule o tempo de duração de cada frasco baseado na administração diária do medicamento.</p>
-  </div>
-</div>
+      <div class="mc-home-card" onclick="carregarCalculadoraHome('Calculadora-frasco.html', 'Calculadora de frasco', 'frasco')">
+        <i class="ti ti-flask" style="color:#993556;" aria-hidden="true"></i>
+        <p class="title">Calculadora de frasco</p>
+        <p class="desc">Saiba a duração de cada frasco individualmente.</p>
+        <span class="link" style="color:#993556;">Acessar <i class="ti ti-arrow-right" style="font-size:14px;" aria-hidden="true"></i></span>
+      </div>
+    </div>
 
-
-    <!-- Como usar -->
-    <div class="como-usar">
-      <h4>Como usar:</h4>
+    <div class="mc-home-howto">
+      <p class="title"><i class="ti ti-list-check" aria-hidden="true"></i>Como usar</p>
       <ol>
-        <li>Clique no menu (☰) ou use Ctrl + B</li>
-        <li>Selecione a calculadora desejada</li>
+        <li>Escolha a calculadora desejada acima</li>
         <li>Preencha os campos necessários</li>
-        <li>Clique em “Calcular” para ver o resultado</li>
+        <li>Toque em "Calcular" para ver o resultado</li>
       </ol>
     </div>
   </div>
 
   <!-- Área da calculadora -->
-  <div class="content" id="calculadoraArea" style="display: none;">
+  <div id="calculadoraArea" style="display: none;">
     <iframe id="calculadoraFrame"></iframe>
   </div>
 
   <script>
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      menu.style.left = (menu.style.left === "0px") ? "-250px" : "0px";
+    // ---------- Tema claro/escuro ----------
+    const THEME_KEY = "dosia-theme";
+
+    function getTheme() {
+      return localStorage.getItem(THEME_KEY) || "dark";
     }
 
-function carregarCalculadora(pagina) {
-  document.getElementById("inicio").style.display = "none";
-  const calcArea = document.getElementById("calculadoraArea");
-  const frame = document.getElementById("calculadoraFrame");
-  frame.src = pagina;
-  calcArea.style.display = "block";
+    function aplicarTema(tema) {
+      document.documentElement.setAttribute("data-theme", tema);
+      const icon = document.getElementById("themeToggleIcon");
+      if (icon) {
+        icon.className = tema === "light" ? "ti ti-sun" : "ti ti-moon";
+      }
+    }
 
-  // Fecha o menu apenas se estiver aberto
-  if (document.getElementById("menu").style.left === "0px") {
-    toggleMenu();
-  }
-}
+    function toggleTheme() {
+      const novoTema = getTheme() === "dark" ? "light" : "dark";
+      localStorage.setItem(THEME_KEY, novoTema);
+      aplicarTema(novoTema);
+      const frame = document.getElementById("calculadoraFrame");
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({ type: "mc-theme", theme: novoTema }, "*");
+      }
+    }
 
-function voltarInicio() {
-  document.getElementById("calculadoraArea").style.display = "none";
-  document.getElementById("inicio").style.display = "block";
+    aplicarTema(getTheme());
 
-  // Fecha o menu apenas se estiver aberto
-  const menu = document.getElementById("menu");
-  if (menu.style.left === "0px") {
-    toggleMenu();
-  }
-}
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("open");
+    }
+
+    function setActiveLink(page) {
+      document.querySelectorAll('.mc-sidebar nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === page);
+      });
+    }
+
+    function closeMenuIfOpen() {
+      if (document.getElementById("menu").classList.contains("open")) {
+        toggleMenu();
+      }
+    }
+
+    // A calculadora dentro do iframe avisa a altura real do conteúdo via
+    // postMessage (theme.js) — assim o iframe cresce/encolhe sem barra de
+    // rolagem própria, inclusive quando o resultado aparece ao calcular.
+    window.addEventListener("message", function (event) {
+      if (event.data && event.data.type === "mc-resize") {
+        document.getElementById("calculadoraFrame").style.height = event.data.height + "px";
+      }
+    });
+
+    function carregarCalculadora(pagina, titulo, linkEl) {
+      document.getElementById("inicio").style.display = "none";
+      const calcArea = document.getElementById("calculadoraArea");
+      const frame = document.getElementById("calculadoraFrame");
+      frame.src = pagina + "?theme=" + getTheme();
+      calcArea.style.display = "block";
+      document.getElementById("headerSection").textContent = titulo || "";
+      setActiveLink(linkEl ? linkEl.dataset.page : "");
+      closeMenuIfOpen();
+    }
+
+    function carregarCalculadoraHome(pagina, titulo, page) {
+      document.getElementById("inicio").style.display = "none";
+      const calcArea = document.getElementById("calculadoraArea");
+      const frame = document.getElementById("calculadoraFrame");
+      frame.src = pagina + "?theme=" + getTheme();
+      calcArea.style.display = "block";
+      document.getElementById("headerSection").textContent = titulo || "";
+      setActiveLink(page);
+    }
+
+    function voltarInicio() {
+      document.getElementById("calculadoraArea").style.display = "none";
+      document.getElementById("inicio").style.display = "block";
+      document.getElementById("headerSection").textContent = "";
+      setActiveLink("home");
+      closeMenuIfOpen();
+    }
 
     document.addEventListener("keydown", function(event) {
       if (event.ctrlKey && event.key === "b") {
@@ -280,19 +216,3 @@ function voltarInicio() {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

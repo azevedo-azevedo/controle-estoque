@@ -1,0 +1,662 @@
+/* ===========================================================
+   DosIA Cuida+ — tema compartilhado (claro/escuro)
+   Usado por index.html e pelas 3 calculadoras (carregadas em iframe)
+   =========================================================== */
+
+:root {
+  --bg: #0d0d0c;
+  --surface-1: #1c1c1a;
+  --surface-2: #131311;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --radius: 8px;
+  --text-primary: #f2f2ed;
+  --text-secondary: #a8a89f;
+  --text-muted: #75756c;
+  --bg-success: #1f2a17;
+
+  --brand: #3d4a2a;
+  --brand-text: #eaf3de;
+  --accent: #3b6d11;
+  --accent-hover: #4a8515;
+  --accent-text: #eaf3de;
+
+  --danger-bg: #fcebeb;
+  --danger-text: #791f1f;
+  --danger-text-strong: #501313;
+}
+
+/* Tema claro — ativado via [data-theme="light"] no <html>, definido pelo
+   botão de alternância no header (index.html) e sincronizado com os
+   iframes das calculadoras. Marca/header, botão principal e alertas
+   mantêm as mesmas cores em ambos os temas. */
+:root[data-theme="light"] {
+  --bg: #e6e8dd;
+  --surface-1: #ffffff;
+  --surface-2: #f5f6f0;
+  --border: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.22);
+  --text-primary: #1c1c1a;
+  --text-secondary: #5c5c54;
+  --text-muted: #83837a;
+  --bg-success: #e3efd7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- Header ---------- */
+/* Barra de app: ocupa a largura toda da janela (mobile e desktop),
+   evitando os vãos pretos que sobravam com um cartão flutuante centralizado. */
+.mc-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 800;
+}
+
+.mc-header {
+  background: var(--brand);
+  padding: 0 clamp(16px, 4vw, 40px);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.mc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mc-header-menu-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.mc-header .ti {
+  color: var(--brand-text);
+}
+
+.mc-header-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mc-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mc-header-brand span {
+  color: var(--brand-text);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.mc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mc-header-section {
+  color: rgba(234, 243, 222, 0.65);
+  font-size: 13px;
+}
+
+/* Switch de tema claro/escuro (estilo trilho + bolinha deslizante) */
+.theme-switch {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: #14140f;
+  flex-shrink: 0;
+  transition: background 0.25s ease;
+}
+
+.theme-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease;
+}
+
+.theme-switch-thumb .ti {
+  font-size: 12px;
+  color: #14140f;
+}
+
+:root[data-theme="light"] .theme-switch {
+  background: #d7dac8;
+}
+
+:root[data-theme="light"] .theme-switch-thumb {
+  transform: translateX(20px);
+}
+
+:root[data-theme="light"] .theme-switch-thumb .ti {
+  color: #8a7a1f;
+}
+
+/* ---------- Sidebar ---------- */
+.mc-sidebar {
+  width: 260px;
+  background: var(--brand);
+  border-radius: 12px;
+  padding: 1rem 0.75rem;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 12px;
+  left: -290px;
+  bottom: 12px;
+  transition: left 0.25s ease;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+}
+
+.mc-sidebar.open {
+  left: 12px;
+}
+
+.mc-sidebar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem 1rem;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.75rem;
+}
+
+.mc-sidebar-top span {
+  color: var(--brand-text);
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mc-sidebar-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.mc-sidebar-close .ti {
+  color: var(--brand-text);
+  font-size: 18px;
+}
+
+.mc-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mc-sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.mc-sidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mc-sidebar nav a.active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mc-sidebar nav a .ti {
+  font-size: 18px;
+  color: #b5d4f4;
+}
+
+.mc-sidebar nav a[data-page="home"] .ti { color: var(--brand-text); }
+.mc-sidebar nav a[data-page="dose"] .ti { color: #b5d4f4; }
+.mc-sidebar nav a[data-page="estoque"] .ti { color: #f0997b; }
+.mc-sidebar nav a[data-page="frasco"] .ti { color: #ed93b1; }
+
+.mc-sidebar nav a span {
+  color: var(--brand-text);
+  font-size: 14px;
+}
+
+.mc-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.mc-sidebar-footer p {
+  color: rgba(234, 243, 222, 0.55);
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+.mc-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+.mc-sidebar-overlay.open {
+  display: block;
+}
+
+/* ---------- Home ---------- */
+.mc-home-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 16px;
+}
+
+.mc-home-intro {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.mc-home-intro h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.mc-home-intro p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.mc-home-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .mc-home-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mc-home-card {
+  background: var(--surface-2);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.mc-home-card:hover {
+  border-color: var(--border-strong);
+}
+
+.mc-home-card .ti {
+  font-size: 22px;
+}
+
+.mc-home-card p.title {
+  font-weight: 500;
+  font-size: 15px;
+  margin: 10px 0 6px;
+}
+
+.mc-home-card p.desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.mc-home-card .link {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mc-home-howto {
+  background: var(--bg-success);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.mc-home-howto p.title {
+  font-weight: 500;
+  font-size: 14px;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mc-home-howto ol {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+/* ---------- Calculator pages (inside iframe) ---------- */
+.calc-page-body {
+  padding: 1.5rem 16px;
+}
+
+.calc-wrap {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.calc-card {
+  background: var(--surface-2);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.calc-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.calc-card-title .ti {
+  font-size: 20px;
+}
+
+.calc-card-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.calc-card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+.calc-section-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 10px;
+}
+
+.calc-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.calc-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .calc-field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calc-field label {
+  font-size: 13px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.calc-field .unit-suffix {
+  position: relative;
+}
+
+.calc-field .unit-suffix input {
+  padding-right: 68px;
+  -moz-appearance: textfield;
+}
+
+.calc-field .unit-suffix input::-webkit-outer-spin-button,
+.calc-field .unit-suffix input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.calc-field .unit-suffix span {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select, input[type="number"], input[type="date"], input[type="text"] {
+  width: 100%;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Buttons */
+.calc-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary, .btn-secondary, .btn-ghost {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 0.5px solid var(--border-strong);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-ghost {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 0.5px solid var(--border);
+  height: 36px;
+  font-size: 13px;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Result block */
+.calc-result {
+  margin-top: 1.25rem;
+}
+
+.calc-result-hero {
+  background: var(--surface-1);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.calc-result-hero .label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+}
+
+.calc-result-hero .value {
+  font-size: 40px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.calc-result-hero.error .value {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--danger-text-strong);
+}
+
+.calc-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 420px) {
+  .calc-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calc-stat {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.calc-stat.alert {
+  background: var(--danger-bg);
+}
+
+.calc-stat p.label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calc-stat.alert p.label {
+  color: var(--danger-text);
+}
+
+.calc-stat p.value {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.calc-stat.alert p.value {
+  color: var(--danger-text-strong);
+}
+
+.calc-result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.calc-result-actions .btn-ghost {
+  flex: 0 0 auto;
+  padding: 0 20px;
+}
+
+.calc-result[hidden] {
+  display: none;
+}
