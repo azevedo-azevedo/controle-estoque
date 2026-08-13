@@ -3,238 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App de Controle de Medicamentos</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-
-    /* Cabeçalho */
-    header {
-      background-color: #4C5B2F;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    header span {
-      font-weight: normal;
-      font-size: 14px;
-      display: block;
-    }
-
-    /* Card central */
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 5px 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0px 0px rgba(255, 255, 255, 0.1);
-      max-width: 900;
-      width: 80%;
-      text-align: center;
-    }
-
-    .icon {
-      font-size: 40px;
-      color: #4C5B2F;
-      margin-bottom: 10px;
-    }
-
-    .card h2 {
-      margin: 0;
-      color: #4C5B2F;
-      font-size: 22px;
-    }
-
-    .card p {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    /* Labels e inputs */
-    label {
-      display: block;
-      text-align: left;
-      margin-top: 15px;
-      font-weight: bold;
-      font-size: 14px;
-      color: #333;
-    }
-
-    select, input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    select:focus, input:focus {
-      border-color: #4C5B2F;
-      outline: none;
-    }
-
-    /* Botões */
-    .btn-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 25px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .btn-calc {
-      background-color: #7d8f6d;
-      color: white;
-      margin-right: 10px;
-    }
-
-    .btn-calc:hover {
-      background-color: #6c7d5d;
-    }
-
-    .btn-clear {
-      background-color: #ddd;
-      color: #333;
-    }
-
-    .btn-clear:hover {
-      background-color: #bbb;
-    }
-
-    /* Resultados */
-    #resultado, #dataFinal, #dataSinalizacao {
-      margin-top: 15px;
-      font-size: 15px;
-      color: #333;
-    }
-
-    #dataSinalizacao {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+  <title>Calculadora de Estoque</title>
+  <script>
+    // Aplica o tema (claro/escuro) recebido do index.html antes do CSS
+    // carregar, para não haver flash do tema errado.
+    (function () {
+      var t = new URLSearchParams(location.search).get("theme");
+      if (t === "light" || t === "dark") {
+        document.documentElement.setAttribute("data-theme", t);
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="theme.css">
+  <script src="theme.js" defer></script>
 </head>
-<body>
+<body class="calc-page-body">
 
-  <!-- Conteúdo -->
-  <div class="container">
-    <div class="card">
-      <h2>📦 Calculadora de Estoque</h2>
-      <p>Determine o tempo de duração do estoque do medicamento com base na administração diária.</p>
+  <div class="calc-wrap">
+    <div class="calc-card">
+      <div class="calc-card-title">
+        <i class="ti ti-package" style="color:#993C1D;" aria-hidden="true"></i>
+        <h3>Calculadora de estoque</h3>
+      </div>
+      <p class="calc-card-desc">Determine o tempo de duração do estoque com base na administração diária.</p>
 
-      <label for="marca">Selecione a Marca:</label>
-      <select id="marca">
-        <option value="35">Biocase (35 gotas/ml)</option>
-        <option value="40">Bontà Botanicals (40 gotas/ml)</option>
-        <option value="44">Canna River (44 gotas/ml)</option>
-        <option value="38">cbdMD (38 gotas/ml)</option>
-        <option value="47">CBfarma (47 gotas/ml)</option>
-        <option value="30">Ease Labs (30 gotas/ml)</option>
-        <option value="43">Eliv (43 gotas/ml)</option>
-        <option value="36">Entourage (36 gotas/ml)</option>
-        <option value="40">Erth Wellness (40 gotas/ml)</option>
-        <option value="42">Evona (42 gotas/ml)</option>
-        <option value="30">Extractos del Sur (30 gotas/ml)</option>
-        <option value="28">Greens JAN-D 1500 (28 gotas/ml)</option>
-        <option value="28">Greens JAN-D 5100 (28 gotas/ml)</option>
-        <option value="32">Greens G-LIFE 6000 (32 gotas/ml)</option>
-        <option value="45">HempMeds RSHO BR 3000 (45 gotas/ml)</option>
-        <option value="50">HempMeds RSHO BR 6000 (50 gotas/ml)</option>
-        <option value="50">HempMeds RSHO Calm Support (50 gotas/ml)</option>
-        <option value="35">HempMeds RSHO Focus Support (35 gotas/ml)</option>
-        <option value="50">HempMeds RSHO X 6000 (50 gotas/ml)</option>
-        <option value="33">HempMeds 9 1:1 (33 gotas/ml)</option>
-        <option value="49">Korasana (49 gotas/ml)</option>
-        <option value="35">Lazarus Naturals (35 gotas/ml)</option>
-        <option value="40">Luna Organics Relief (40 gotas/ml)</option>
-        <option value="48">Luna Organics Sleep (48 gotas/ml)</option>
-        <option value="41">Moonlion (41 gotas/ml)</option>
-        <option value="48">Naternal (48 gotas/ml)</option>
-        <option value="52">Natyva (52 gotas/ml)</option>
-        <option value="42">Neurogan (42 gotas/ml)</option>
-        <option value="40">Nex Biopharma (40 gotas/ml)</option>
-        <option value="40">Odonto CBD (40 gotas/ml)</option>
-        <option value="50">Okii (50 gotas/ml)</option>
-        <option value="45">Pure Jamaican (45 gotas/ml)</option>
-        <option value="40">Remederi (40 gotas/ml)</option>
-        <option value="33">Sensia 1:1 CBD/THC e THC (33 gotas/ml)</option>
-        <option value="45">Sensia (45 gotas/ml)</option>
-        <option value="56">Serene (56 gotas/ml)</option>
-        <option value="46">Swiss Vitalis (46 gotas/ml)</option>
-        <option value="35">UB Super (35 gotas/ml)</option>
-        <option value="30">USA Hemp (30 gotas/ml)</option>
-        <option value="34">Valtellinamed (34 gotas/ml)</option>
-        <option value="30">Volcanic (30 gotas/ml)</option>
-        <option value="37">Zion (37 gotas/ml)</option>
-      </select>
-
-      <label for="unidade">Unidade de Dosagem:</label>
-      <select id="unidade" onchange="atualizarPlaceholder()">
-        <option value="gotas">Gotas</option>
-        <option value="ml">mL</option>
-      </select>
-
-      <label for="volume">Volume do Frasco (mL):</label>
-      <select id="volume">
-        <option value="10">10 mL</option>
-        <option value="15">15 mL</option>
-        <option value="30">30 mL</option>
-        <option value="60">60 mL</option>
-        <option value="120">120 mL</option>
-      </select>
-
-      <label for="dosagem">Dosagem Diária:</label>
-      <input type="number" id="dosagem" placeholder="Informe a dosagem" min="0.01" step="0.01">
-
-      <label for="quantidade">Quantidade de Frascos:</label>
-      <input type="number" id="quantidade" placeholder="Quantidade de frascos" min="1" step="1" value="1">
-
-      <label for="dataInicio">Data de Início:</label>
-      <input type="date" id="dataInicio">
-
-      <!-- Botões -->
-      <div class="btn-container">
-        <button class="btn-calc" onclick="calcularDuracao()">+ Calcular Estoque</button>
-        <button class="btn-clear" onclick="document.getElementById('resultado').innerHTML='';document.getElementById('dataFinal').innerHTML='';document.getElementById('dataSinalizacao').innerHTML=''">– Limpar</button>
+      <p class="calc-section-label">Medicamento</p>
+      <div class="calc-field-group">
+        <div class="calc-field">
+          <label for="marca">Marca</label>
+          <select id="marca">
+            <option value="40">Akras (40 gotas/ml)</option>
+            <option value="35">Biocase (35 gotas/ml)</option>
+            <option value="40">Bontà Botanicals (40 gotas/ml)</option>
+            <option value="44">Canna River (44 gotas/ml)</option>
+            <option value="38">cbdMD (38 gotas/ml)</option>
+            <option value="47">CBfarma (47 gotas/ml)</option>
+            <option value="30">Ease Labs (30 gotas/ml)</option>
+            <option value="43">Eliv (43 gotas/ml)</option>
+            <option value="36">Entourage (36 gotas/ml)</option>
+            <option value="40">Erth Wellness (40 gotas/ml)</option>
+            <option value="42">Evona (42 gotas/ml)</option>
+            <option value="30">Extractos del Sur (30 gotas/ml)</option>
+            <option value="30">FoliuMed (30 gotas/ml)</option>
+            <option value="35">Full Spectrum Biologics (35 gotas/ml)</option>
+            <option value="28">Greens JAN-D 1500 (28 gotas/ml)</option>
+            <option value="28">Greens JAN-D 5100 (28 gotas/ml)</option>
+            <option value="32">Greens G-LIFE 6000 (32 gotas/ml)</option>
+            <option value="45">HempMeds RSHO BR 3000 (45 gotas/ml)</option>
+            <option value="50">HempMeds RSHO BR 6000 (50 gotas/ml)</option>
+            <option value="50">HempMeds RSHO Calm Support (50 gotas/ml)</option>
+            <option value="35">HempMeds RSHO Focus Support (35 gotas/ml)</option>
+            <option value="50">HempMeds RSHO X 6000 (50 gotas/ml)</option>
+            <option value="33">HempMeds 9 1:1 (33 gotas/ml)</option>
+            <option value="49">Korasana (49 gotas/ml)</option>
+            <option value="35">Lazarus Naturals (35 gotas/ml)</option>
+            <option value="40">Luna Organics Relief (40 gotas/ml)</option>
+            <option value="48">Luna Organics Sleep (48 gotas/ml)</option>
+            <option value="41">Moonlion (41 gotas/ml)</option>
+            <option value="48">Naternal (48 gotas/ml)</option>
+            <option value="52">Natyva (52 gotas/ml)</option>
+            <option value="42">Neurogan (42 gotas/ml)</option>
+            <option value="40">Nex Biopharma (40 gotas/ml)</option>
+            <option value="40">Odonto CBD (40 gotas/ml)</option>
+            <option value="50">Okii (50 gotas/ml)</option>
+            <option value="45">Pure Jamaican (45 gotas/ml)</option>
+            <option value="40">Remederi (40 gotas/ml)</option>
+            <option value="33">Sensia 1:1 CBD/THC e THC (33 gotas/ml)</option>
+            <option value="45">Sensia (45 gotas/ml)</option>
+            <option value="56">Serene (56 gotas/ml)</option>
+            <option value="33">SereneCBD (33 gotas/ml)</option>
+            <option value="46">Swiss Vitalis (46 gotas/ml)</option>
+            <option value="35">UB Super (35 gotas/ml)</option>
+            <option value="30">USA Hemp (30 gotas/ml)</option>
+            <option value="34">Valtellinamed (34 gotas/ml)</option>
+            <option value="30">Volcanic (30 gotas/ml)</option>
+            <option value="37">Zion (37 gotas/ml)</option>
+          </select>
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="unidade">Unidade de dosagem</label>
+            <select id="unidade" onchange="atualizarPlaceholder()">
+              <option value="gotas">Gotas</option>
+              <option value="ml">mL</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label for="volume">Volume do frasco</label>
+            <select id="volume">
+              <option value="10">10 mL</option>
+              <option value="15">15 mL</option>
+              <option value="30">30 mL</option>
+              <option value="60">60 mL</option>
+              <option value="120">120 mL</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <!-- Resultados -->
-      <p id="resultado"></p>
-      <p id="dataFinal"></p>
-      <p id="dataSinalizacao"></p>
+      <p class="calc-section-label">Administração</p>
+      <div class="calc-field-group">
+        <div class="calc-field">
+          <label for="dosagem">Dosagem diária</label>
+          <div class="unit-suffix">
+            <input type="number" id="dosagem" placeholder="Ex: 15" min="0.01" step="0.01">
+            <span id="dosagemUnidadeLabel">gotas/dia</span>
+          </div>
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="quantidade">Quantidade de frascos</label>
+            <input type="number" id="quantidade" min="1" step="1" value="1">
+          </div>
+          <div class="calc-field">
+            <label for="dataInicio">Data de início</label>
+            <input type="date" id="dataInicio">
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-buttons">
+        <button class="btn-primary" onclick="calcularDuracao()">Calcular estoque</button>
+        <button class="btn-secondary" onclick="limparCampos()">Limpar</button>
+      </div>
+
+      <div class="calc-result" id="resultBlock" hidden>
+        <div class="calc-result-hero" id="heroBox">
+          <p class="label" id="heroLabel">O frasco vai durar aproximadamente</p>
+          <p class="value" id="heroValue">—</p>
+        </div>
+
+        <div class="calc-result-grid" id="statsGrid">
+          <div class="calc-stat">
+            <p class="label"><i class="ti ti-calendar" aria-hidden="true"></i>Estoque termina em</p>
+            <p class="value" id="statTermina">—</p>
+          </div>
+          <div class="calc-stat alert">
+            <p class="label"><i class="ti ti-bell" aria-hidden="true"></i>Sinalizar paciente</p>
+            <p class="value" id="statSinaliza">—</p>
+          </div>
+        </div>
+
+        <div class="calc-result-actions">
+          <button class="btn-ghost" onclick="copiarResultado()"><i class="ti ti-copy" aria-hidden="true"></i>Copiar resultado</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    let ultimoResultadoTexto = "";
+
     function atualizarPlaceholder() {
       const unidade = document.getElementById("unidade").value;
-      document.getElementById("dosagem").placeholder =
-        unidade === "gotas" ? "Informe a dosagem em gotas" : "Informe a dosagem em mL";
+      document.getElementById("dosagem").placeholder = unidade === "gotas" ? "Ex: 15" : "Ex: 0,5";
+      document.getElementById("dosagemUnidadeLabel").textContent = unidade === "gotas" ? "gotas/dia" : "mL/dia";
+    }
+
+    function mostrarErro(msg) {
+      const resultBlock = document.getElementById("resultBlock");
+      const heroBox = document.getElementById("heroBox");
+      const statsGrid = document.getElementById("statsGrid");
+      const actions = document.querySelector(".calc-result-actions");
+
+      resultBlock.hidden = false;
+      heroBox.classList.add("error");
+      document.getElementById("heroLabel").textContent = "";
+      document.getElementById("heroValue").textContent = msg;
+      statsGrid.style.display = "none";
+      actions.style.display = "none";
     }
 
     function calcularDuracao() {
@@ -245,14 +183,8 @@
       const quantidadeFrascos = parseInt(document.getElementById("quantidade").value) || 1;
       const dataInicio = document.getElementById("dataInicio").value;
 
-      const resultado = document.getElementById("resultado");
-      const dataFinal = document.getElementById("dataFinal");
-      const dataSinalizacao = document.getElementById("dataSinalizacao");
-
       if (isNaN(dosagem) || dosagem <= 0 || !dataInicio) {
-        resultado.innerHTML = '<span style="color: red;">Por favor, insira uma dosagem válida e a data de início.</span>';
-        dataFinal.innerHTML = "";
-        dataSinalizacao.innerHTML = "";
+        mostrarErro("Insira uma dosagem válida e a data de início.");
         return;
       }
 
@@ -263,20 +195,52 @@
       } else {
         dias = volume / dosagem;
       }
-
       dias *= quantidadeFrascos;
-
-      resultado.innerHTML = `O(s) frasco(s) irá(ão) durar aproximadamente <strong>${Math.floor(dias)}</strong> dias.`;
+      dias = Math.floor(dias);
 
       const dataInicioObj = new Date(dataInicio);
-      dataInicioObj.setDate(dataInicioObj.getDate() + Math.floor(dias));
+      dataInicioObj.setDate(dataInicioObj.getDate() + dias);
       const dataFinalStr = dataInicioObj.toLocaleDateString('pt-BR');
-      dataFinal.innerHTML = `A data final do estoque será: <strong>${dataFinalStr}</strong>`;
 
       const dataSinalizacaoObj = new Date(dataInicioObj);
       dataSinalizacaoObj.setDate(dataSinalizacaoObj.getDate() - 45);
       const dataSinalizacaoStr = dataSinalizacaoObj.toLocaleDateString('pt-BR');
-      dataSinalizacao.innerHTML = `O paciente deve ser sinalizado no dia: <strong>${dataSinalizacaoStr}</strong>`;
+
+      const resultBlock = document.getElementById("resultBlock");
+      const heroBox = document.getElementById("heroBox");
+      const statsGrid = document.getElementById("statsGrid");
+      const actions = document.querySelector(".calc-result-actions");
+
+      resultBlock.hidden = false;
+      heroBox.classList.remove("error");
+      statsGrid.style.display = "";
+      actions.style.display = "";
+
+      document.getElementById("heroLabel").textContent = quantidadeFrascos > 1
+        ? "Os frascos vão durar aproximadamente"
+        : "O frasco vai durar aproximadamente";
+      document.getElementById("heroValue").textContent = dias + (dias === 1 ? " dia" : " dias");
+      document.getElementById("statTermina").textContent = dataFinalStr;
+      document.getElementById("statSinaliza").textContent = dataSinalizacaoStr;
+
+      ultimoResultadoTexto = `Estoque dura ${dias} dias · Termina em ${dataFinalStr} · Sinalizar paciente em ${dataSinalizacaoStr}`;
+    }
+
+    function limparCampos() {
+      document.getElementById("dosagem").value = "";
+      document.getElementById("quantidade").value = "1";
+      document.getElementById("dataInicio").value = "";
+      document.getElementById("resultBlock").hidden = true;
+    }
+
+    function copiarResultado() {
+      const label = document.getElementById("heroLabel").textContent.trim();
+      const value = document.getElementById("heroValue").textContent.trim();
+      if (!value || value === "—") return;
+      const texto = `${label} ${value}`.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto);
+      }
     }
 
     document.addEventListener("keydown", function(event) {
@@ -289,5 +253,3 @@
   </script>
 </body>
 </html>
-
-
