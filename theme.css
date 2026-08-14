@@ -24,6 +24,10 @@
   --danger-bg: #fcebeb;
   --danger-text: #791f1f;
   --danger-text-strong: #501313;
+
+  --error-text: #ff8a80;
+  --error-bg: rgba(255, 138, 128, 0.1);
+  --error-border: rgba(255, 138, 128, 0.35);
 }
 
 /* Tema claro — ativado via [data-theme="light"] no <html>, definido pelo
@@ -40,6 +44,10 @@
   --text-secondary: #5c5c54;
   --text-muted: #83837a;
   --bg-success: #e3efd7;
+
+  --error-text: #b3261e;
+  --error-bg: rgba(179, 38, 30, 0.08);
+  --error-border: rgba(179, 38, 30, 0.3);
 }
 
 * {
@@ -262,6 +270,8 @@ a {
 .mc-sidebar nav a[data-page="dose"] .ti { color: #b5d4f4; }
 .mc-sidebar nav a[data-page="estoque"] .ti { color: #f0997b; }
 .mc-sidebar nav a[data-page="frasco"] .ti { color: #ed93b1; }
+.mc-sidebar nav a[data-page="escalonamento"] .ti { color: #c9b6f0; }
+.mc-sidebar nav a[data-page="tirzepatida"] .ti { color: #7fd6cf; }
 
 .mc-sidebar nav a span {
   color: var(--brand-text);
@@ -294,7 +304,7 @@ a {
 
 /* ---------- Home ---------- */
 .mc-home-wrap {
-  max-width: 680px;
+  max-width: 840px;
   margin: 0 auto;
   padding: 2rem 16px;
 }
@@ -319,15 +329,9 @@ a {
 
 .mc-home-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
   gap: 12px;
   margin-bottom: 1.25rem;
-}
-
-@media (max-width: 640px) {
-  .mc-home-cards {
-    grid-template-columns: 1fr;
-  }
 }
 
 .mc-home-card {
@@ -400,6 +404,108 @@ a {
   margin: 0 auto;
 }
 
+.calc-wrap.wide {
+  max-width: 640px;
+}
+
+/* ---------- Escalonamento de dose ---------- */
+.segmented {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.segmented button {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: #e6f1fb;
+  border-color: #378add;
+  color: #0c447c;
+  font-weight: 500;
+}
+
+.fase-manual-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.fase-manual-remover {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.phase-preview {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.phase-chip {
+  flex: 0 0 100px;
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 10px;
+  text-align: center;
+}
+
+.phase-chip.target {
+  background: #e6f1fb;
+}
+
+.phase-chip .chip-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0 0 2px;
+}
+
+.phase-chip.target .chip-label {
+  color: #0c447c;
+}
+
+.phase-chip .chip-value {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.phase-chip.target .chip-value {
+  color: #0c447c;
+}
+
+.phase-chip .chip-days {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.phase-chip .chip-mg {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  padding-top: 4px;
+  border-top: 0.5px solid var(--border);
+}
+
+.phase-chip.target .chip-mg {
+  color: #0c447c;
+  border-top-color: rgba(12, 68, 124, 0.2);
+}
+
 .calc-card {
   background: var(--surface-2);
   border: 0.5px solid var(--border);
@@ -462,6 +568,12 @@ a {
   font-weight: 500;
   display: block;
   margin-bottom: 4px;
+}
+
+.calc-field-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
 }
 
 .calc-field .unit-suffix {
@@ -594,10 +706,15 @@ select:focus, input:focus {
   margin: 0;
 }
 
+.calc-result-hero.error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+}
+
 .calc-result-hero.error .value {
   font-size: 16px;
   font-weight: 500;
-  color: var(--danger-text-strong);
+  color: var(--error-text);
 }
 
 .calc-result-grid {
@@ -605,6 +722,10 @@ select:focus, input:focus {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 1rem;
+}
+
+.calc-result-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 @media (max-width: 420px) {
