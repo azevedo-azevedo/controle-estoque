@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Tirzepatida</title>
+  <script>
+    // Aplica o tema (claro/escuro) recebido do index.html antes do CSS
+    // carregar, para não haver flash do tema errado.
+    (function () {
+      var t = new URLSearchParams(location.search).get("theme");
+      if (t === "light" || t === "dark") {
+        document.documentElement.setAttribute("data-theme", t);
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="theme.css">
+  <script src="theme.js" defer></script>
+</head>
+<body class="calc-page-body">
+
+  <div class="calc-wrap">
+    <div class="calc-card">
+      <div class="calc-card-title">
+        <i class="ti ti-vaccine" style="color:#0E7C86;" aria-hidden="true"></i>
+        <h3>Calculadora de Tirzepatida</h3>
+      </div>
+      <p class="calc-card-desc">Converta a dose e estime a duração do frasco com base na administração.</p>
+
+      <p class="calc-section-label">Frasco</p>
+      <div class="calc-field-group">
+        <div class="calc-field">
+          <label for="concentracao">Concentração</label>
+          <select id="concentracao">
+            <option value="30|3">30 mg / 3 mL</option>
+            <option value="10|1">10 mg / 1 mL</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="calc-section-label">Administração</p>
+      <div class="calc-field-group">
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="doseValor">Dose</label>
+            <input type="number" id="doseValor" step="0.01" placeholder="Ex: 5">
+          </div>
+          <div class="calc-field">
+            <label for="doseUnidade">Unidade</label>
+            <select id="doseUnidade">
+              <option value="mg">mg</option>
+              <option value="mL">mL</option>
+              <option value="UI">UI</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="freqValor">Administração a cada</label>
+            <input type="number" id="freqValor" placeholder="Ex: 7" min="1" step="1">
+          </div>
+          <div class="calc-field">
+            <label for="freqUnidade">Período</label>
+            <select id="freqUnidade">
+              <option value="dias">Dias</option>
+              <option value="semanas" selected>Semanas</option>
+              <option value="meses">Meses</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="qtdFrascos">Quantidade de frascos</label>
+            <input type="number" id="qtdFrascos" value="1" min="1" step="1">
+          </div>
+          <div class="calc-field">
+            <label for="dataInicio">Data de início</label>
+            <input type="date" id="dataInicio">
+            <p class="calc-field-hint">Se não preenchida, considera hoje.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-buttons">
+        <button class="btn-primary" onclick="calcularTirzepatida()">Calcular dose</button>
+        <button class="btn-secondary" onclick="limparCampos()">Limpar</button>
+      </div>
+
+      <div class="calc-result" id="resultBlock" hidden>
+        <div class="calc-result-hero" id="heroBox">
+          <p class="label" id="heroLabel">O frasco vai durar aproximadamente</p>
+          <p class="value" id="heroValue">—</p>
+        </div>
+
+        <div class="calc-result-grid cols-3" id="unidadesGrid">
+          <div class="calc-stat">
+            <p class="label"><i class="ti ti-droplet" aria-hidden="true"></i>Em mL</p>
+            <p class="value" id="resMl">—</p>
+          </div>
+          <div class="calc-stat">
+            <p class="label"><i class="ti ti-flask" aria-hidden="true"></i>Em mg</p>
+            <p class="value" id="resMg">—</p>
+          </div>
+          <div class="calc-stat">
+            <p class="label"><i class="ti ti-vaccine" aria-hidden="true"></i>Em UI</p>
+            <p class="value" id="resUi">—</p>
+          </div>
+        </div>
+
+        <div class="calc-result-grid" id="statsGrid">
+          <div class="calc-stat">
+            <p class="label"><i class="ti ti-calendar" aria-hidden="true"></i>Estoque termina em</p>
+            <p class="value" id="resDataFim">—</p>
+          </div>
+          <div class="calc-stat alert">
+            <p class="label"><i class="ti ti-bell" aria-hidden="true"></i>Sinalizar paciente</p>
+            <p class="value" id="resDataAlerta">—</p>
+          </div>
+        </div>
+
+        <div class="calc-result-actions">
+          <button class="btn-ghost" onclick="copiarResultado()"><i class="ti ti-copy" aria-hidden="true"></i>Copiar resultado</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const UI_POR_MG = 10; // regra fixa: 1 mg = 10 UI
+    const DIAS_ALERTA_ANTECEDENCIA = 45;
+    let ultimoResultadoTexto = "";
+
+    // Data de hoje no formato aceito por new Date("YYYY-MM-DD"), usada
+    // quando o campo "Data de início" é deixado em branco.
+    function hojeISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function getConcentracao() {
+      const [mg, ml] = document.getElementById("concentracao").value.split("|").map(Number);
+      return { totalMg: mg, totalMl: ml };
+    }
+
+    function addDias(data, dias) {
+      const d = new Date(data);
+      d.setDate(d.getDate() + dias);
+      return d;
+    }
+
+    function mostrarErro(msg) {
+      const resultBlock = document.getElementById("resultBlock");
+      const heroBox = document.getElementById("heroBox");
+      const unidadesGrid = document.getElementById("unidadesGrid");
+      const statsGrid = document.getElementById("statsGrid");
+      const actions = document.querySelector(".calc-result-actions");
+
+      resultBlock.hidden = false;
+      heroBox.classList.add("error");
+      document.getElementById("heroLabel").textContent = "";
+      document.getElementById("heroValue").textContent = msg;
+      unidadesGrid.style.display = "none";
+      statsGrid.style.display = "none";
+      actions.style.display = "none";
+    }
+
+    function calcularTirzepatida() {
+      const { totalMg, totalMl } = getConcentracao();
+      if (!totalMg || !totalMl) {
+        mostrarErro("Selecione a concentração do frasco.");
+        return;
+      }
+      const mgPorMl = totalMg / totalMl;
+
+      const doseValor = Number(document.getElementById("doseValor").value);
+      const doseUnidade = document.getElementById("doseUnidade").value;
+      if (!doseValor || doseValor <= 0) {
+        mostrarErro("Informe a dose.");
+        return;
+      }
+
+      let doseMg;
+      if (doseUnidade === "mg") doseMg = doseValor;
+      else if (doseUnidade === "mL") doseMg = doseValor * mgPorMl;
+      else doseMg = doseValor / UI_POR_MG; // UI
+
+      const doseMl = doseMg / mgPorMl;
+      const doseUi = doseMg * UI_POR_MG;
+
+      const freqValor = Number(document.getElementById("freqValor").value);
+      const freqUnidade = document.getElementById("freqUnidade").value;
+      if (!freqValor || freqValor <= 0) {
+        mostrarErro("Informe a frequência de administração.");
+        return;
+      }
+      const fatorDias = freqUnidade === "dias" ? 1 : freqUnidade === "semanas" ? 7 : 30;
+      const freqDias = freqValor * fatorDias;
+
+      const qtdFrascos = Number(document.getElementById("qtdFrascos").value) || 1;
+      const estoqueMg = totalMg * qtdFrascos;
+
+      const numAplicacoes = estoqueMg / doseMg;
+      const duracaoDias = Math.round(numAplicacoes * freqDias);
+
+      const dataInicioInput = document.getElementById("dataInicio").value || hojeISO();
+      const dataInicio = new Date(dataInicioInput + "T00:00:00");
+      const dataFim = addDias(dataInicio, duracaoDias);
+      const dataAlerta = addDias(dataFim, -DIAS_ALERTA_ANTECEDENCIA);
+
+      const resultBlock = document.getElementById("resultBlock");
+      const heroBox = document.getElementById("heroBox");
+      const unidadesGrid = document.getElementById("unidadesGrid");
+      const statsGrid = document.getElementById("statsGrid");
+      const actions = document.querySelector(".calc-result-actions");
+
+      resultBlock.hidden = false;
+      heroBox.classList.remove("error");
+      unidadesGrid.style.display = "";
+      statsGrid.style.display = "";
+      actions.style.display = "";
+
+      let heroTexto = duracaoDias + (duracaoDias === 1 ? " dia" : " dias");
+      const meses = duracaoDias / 30;
+      if (meses >= 1) {
+        heroTexto += ` (≈ ${meses.toFixed(1)} meses)`;
+      }
+
+      document.getElementById("heroLabel").textContent = "O frasco vai durar aproximadamente";
+      document.getElementById("heroValue").textContent = heroTexto;
+      document.getElementById("resMl").textContent = doseMl.toFixed(2) + " mL";
+      document.getElementById("resMg").textContent = doseMg.toFixed(2) + " mg";
+      document.getElementById("resUi").textContent = doseUi.toFixed(1) + " UI";
+      document.getElementById("resDataFim").textContent = dataFim.toLocaleDateString('pt-BR');
+      document.getElementById("resDataAlerta").textContent = dataAlerta.toLocaleDateString('pt-BR');
+
+      ultimoResultadoTexto =
+        `Dose: ${doseMl.toFixed(2)} mL / ${doseMg.toFixed(2)} mg / ${doseUi.toFixed(1)} UI · ` +
+        `Estoque dura ${duracaoDias} dias · Termina em ${dataFim.toLocaleDateString('pt-BR')} · ` +
+        `Sinalizar paciente em ${dataAlerta.toLocaleDateString('pt-BR')}`;
+    }
+
+    function limparCampos() {
+      document.getElementById("concentracao").value = "30|3";
+      document.getElementById("doseValor").value = "";
+      document.getElementById("doseUnidade").value = "mg";
+      document.getElementById("freqValor").value = "";
+      document.getElementById("freqUnidade").value = "semanas";
+      document.getElementById("qtdFrascos").value = "1";
+      document.getElementById("dataInicio").value = "";
+      document.getElementById("resultBlock").hidden = true;
+    }
+
+    function copiarResultado() {
+      const label = document.getElementById("heroLabel").textContent.trim();
+      const value = document.getElementById("heroValue").textContent.trim();
+      if (!value || value === "—") return;
+      const texto = `${label} ${value}`.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto);
+      }
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        calcularTirzepatida();
+        document.activeElement.blur();
+      }
+    });
+  </script>
+</body>
+</html>

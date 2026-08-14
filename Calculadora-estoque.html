@@ -119,6 +119,7 @@
           <div class="calc-field">
             <label for="dataInicio">Data de início</label>
             <input type="date" id="dataInicio">
+            <p class="calc-field-hint">Se não preenchida, considera hoje.</p>
           </div>
         </div>
       </div>
@@ -155,6 +156,13 @@
   <script>
     let ultimoResultadoTexto = "";
 
+    // Data de hoje no formato aceito por new Date("YYYY-MM-DD"), usada
+    // quando o campo "Data de início" é deixado em branco.
+    function hojeISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
     function atualizarPlaceholder() {
       const unidade = document.getElementById("unidade").value;
       document.getElementById("dosagem").placeholder = unidade === "gotas" ? "Ex: 15" : "Ex: 0,5";
@@ -181,10 +189,10 @@
       const volume = parseFloat(document.getElementById("volume").value);
       const dosagem = parseFloat(document.getElementById("dosagem").value);
       const quantidadeFrascos = parseInt(document.getElementById("quantidade").value) || 1;
-      const dataInicio = document.getElementById("dataInicio").value;
+      const dataInicio = document.getElementById("dataInicio").value || hojeISO();
 
-      if (isNaN(dosagem) || dosagem <= 0 || !dataInicio) {
-        mostrarErro("Insira uma dosagem válida e a data de início.");
+      if (isNaN(dosagem) || dosagem <= 0) {
+        mostrarErro("Insira uma dosagem válida.");
         return;
       }
 
